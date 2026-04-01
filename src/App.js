@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { db } from "./firebase";
 import {
   collection,
@@ -17,6 +17,16 @@ function App() {
   const [isAdding, setIsAdding] = useState(false);
   const notesCollection = collection(db, "notes");
 
+  const fetchNotes = useCallback(async () => {
+    const data = await getDocs(notesCollection);
+    setNotes(
+      data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id
+      }))
+    );
+  }, [notesCollection]);
+
   const addNote = async () => {
     if (note.trim() === "" || isAdding) return;
     setIsAdding(true);
@@ -28,16 +38,6 @@ function App() {
     setNote("");
     await fetchNotes();
     setIsAdding(false);
-  };
-
-  const fetchNotes = async () => {
-    const data = await getDocs(notesCollection);
-    setNotes(
-      data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id
-      }))
-    );
   };
 
   const deleteNote = async (id) => {
@@ -52,7 +52,7 @@ function App() {
 
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [fetchNotes]);
 
   const titleLetters = "My Notes!".split("");
 
