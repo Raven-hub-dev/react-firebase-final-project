@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+ import { useState, useEffect, useCallback } from "react";
 import { db } from "./firebase";
 import {
   collection,
@@ -17,6 +17,7 @@ function App() {
   const [isAdding, setIsAdding] = useState(false);
   const notesCollection = collection(db, "notes");
 
+  // Wrap fetchNotes with useCallback to memoize it
   const fetchNotes = useCallback(async () => {
     const data = await getDocs(notesCollection);
     setNotes(
@@ -50,6 +51,7 @@ function App() {
     if (e.key === "Enter") addNote();
   };
 
+  // Now fetchNotes is properly included in the dependency array
   useEffect(() => {
     fetchNotes();
   }, [fetchNotes]);
